@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# roast.sh - because my terminal was too polite
+# written when I got tired of "command not found" without any personality
+
+RED='\033[0;31m'
+NC='\033[0m'
+
+# the below function runs whenever bash can't find a command
+command_not_found_handler() {
+
+	local cmd="$1"
+	echo ""
+	echo -e "${RED}ay, what did you type${NC}"
+	echo "you typed: $cmd"
+	echo "bash says: whaaaaaat?"
+	echo ""
+	return 127
+
+}
