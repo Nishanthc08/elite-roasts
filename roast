@@ -1,10 +1,21 @@
 #!/bin/bash
 
-# roast.sh - because my terminal was too polite
+# roast.sh - now with actual roasts
 # written when I got tired of "command not found" without any personality
 
 RED='\033[0;31m'
 NC='\033[0m'
+
+# all the roasts go here
+# add more whenever you think of something funny at 2am
+INSULTS=(
+	"en guru, keyboard mele kai biditta??"
+	"google ge kooda gottilla ee command"
+	"BMTC bus ge schedule ide, nin typing ge illa"
+	"ayyoo even nan ajji types better"
+	"koramangala parking tara - not found"
+	"silk board signal timing tara mysterious"
+)
 
 # the below function runs whenever bash can't find a command
 command_not_found_handler() {
@@ -14,7 +25,12 @@ command_not_found_handler() {
 	echo -e "${RED}ay, what did you type${NC}"
 	echo "you typed: $cmd"
 	echo "bash says: whaaaaaat?"
+
+	# pick a random roast from the array
+	local roast=${INSULTS[$RANDOM % ${#INSULTS[@]}]}
+	echo -e "${RED}$roasts${NC}"
 	echo ""
+
 	return 127
 
 }
