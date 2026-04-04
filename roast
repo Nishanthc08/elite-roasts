@@ -1,36 +1,75 @@
 #!/bin/bash
 
-# roast.sh - now with actual roasts
-# written when I got tired of "command not found" without any personality
+# roast.sh - adding typo suggestions because even I make typos
 
 RED='\033[0;31m'
+GREEN='\033[0;32m'
 NC='\033[0m'
 
-# all the roasts go here
-# add more whenever you think of something funny at 2am
+# roast array - add more as you go
 INSULTS=(
-	"en guru, keyboard mele kai biditta??"
-	"google ge kooda gottilla ee command"
-	"BMTC bus ge schedule ide, nin typing ge illa"
-	"ayyoo even nan ajji types better"
-	"koramangala parking tara - not found"
-	"silk board signal timing tara mysterious"
+    "en guru, keyboard mele kai biditta??"
+    "google kooda gottilla ee command"
+    "BMTC ge schedule ide, ninna typing ge enu illa"
+    "ayyoo even nanna ajji types better"
+    "koramangala parking tara - not found"
+    "silk board signal timing tara mysterious"
+    "ninna keyboard layout changed aa??"
+    "this command doesn't exist da"
+    "autocomplete kooda give up maadbittu"
 )
 
-# the below function runs whenever bash can't find a command
-command_not_found_handler() {
+# try to figure out what they meant to type
+# common typos I keep making
+suggest_correction() {
+    local cmd="$1"
+    
+    # this is basically a lookup table for my dumb typos
+    declare -A typo_map=(
+        ["gti"]="git"         ["got"]="git"          ["gut"]="git"
+        ["gi"]="git"          ["gitt"]="git"         ["igt"]="git"
+        ["pythoon"]="python"  ["pythn"]="python"     ["pyhton"]="python"
+        ["pyton"]="python"    ["pytho"]="python"
+        ["lss"]="ls"          ["sl"]="ls"            ["ks"]="ls"
+        ["cdd"]="cd"          ["dc"]="cd"            ["dcd"]="cd"
+        ["catt"]="cat"        ["caht"]="cat"
+        ["grpe"]="grep"       ["gerp"]="grep"        ["grp"]="grep"
+        ["suod"]="sudo"       ["sduo"]="sudo"
+        ["touuch"]="touch"    ["tuch"]="touch"
+        ["vmi"]="vim"         ["iv"]="vi"
+        ["atp"]="apt"         ["tpa"]="apt"
+        ["clur"]="curl"       ["crul"]="curl"
+    )
+    
+    # check if it's in our typo map first
+    if [[ -n "${typo_map[$cmd]}" ]]; then
+        echo "${typo_map[$cmd]}"
+        return
+    fi
+    
+    # fallback: use compgen to find commands starting with same letters
+    compgen -c | grep "^${cmd:0:2}" | sort -u | head -3 | tr '\n' ' ' 2>/dev/null
+}
 
-	local cmd="$1"
-	echo ""
-	echo -e "${RED}ay, what did you type${NC}"
-	echo "you typed: $cmd"
-	echo "bash says: whaaaaaat?"
-
-	# pick a random roast from the array
-	local roast=${INSULTS[$RANDOM % ${#INSULTS[@]}]}
-	echo -e "${RED}$roasts${NC}"
-	echo ""
-
-	return 127
-
+# runs when bash can't find a command
+command_not_found_handle() {
+    local cmd="$1"
+    echo ""
+    echo -e "${RED}-- aye what did you type --${NC}"
+    echo ""
+    echo "you typed: $cmd"
+    echo ""
+    
+    # pick a random roast
+    local roast=${INSULTS[$RANDOM % ${#INSULTS[@]}]}
+    echo -e "${RED}$roast${NC}"
+    
+    # try to help them out
+    local suggestion=$(suggest_correction "$cmd")
+    if [[ -n "$suggestion" ]]; then
+        echo -e "${GREEN}did you mean: $suggestion${NC}"
+    fi
+    echo ""
+    
+    return 127
 }
